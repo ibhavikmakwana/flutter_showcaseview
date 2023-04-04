@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:example/detailscreen.dart';
+import 'package:example/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -56,7 +57,6 @@ class _MailPageState extends State<MailPage> {
   final GlobalKey _three = GlobalKey();
   final GlobalKey _four = GlobalKey();
   final GlobalKey _five = GlobalKey();
-  final GlobalKey _six = GlobalKey();
   List<Mail> mails = [];
 
   final scrollController = ScrollController();
@@ -65,73 +65,75 @@ class _MailPageState extends State<MailPage> {
   void initState() {
     super.initState();
     //Start showcase view after current widget frames are drawn.
-    WidgetsBinding.instance!.addPostFrameCallback(
-      (_) => ShowCaseWidget.of(context)!
-          .startShowCase([_one, _two, _three, _four, _five, _six]),
+    //NOTE: remove ambiguate function if you are using
+    //flutter version greater than 3.x and direct use WidgetsBinding.instance
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback(
+      (_) => ShowCaseWidget.of(context)
+          .startShowCase([_one, _two, _three, _four, _five]),
     );
     mails = [
       Mail(
         sender: 'Medium',
         sub: 'Showcase View',
         msg: 'Check new showcase View',
-        date: '25 May',
+        date: '1 May',
         isUnread: false,
       ),
       Mail(
         sender: 'Quora',
         sub: 'New Question for you',
         msg: 'Hi, There is new question for you',
-        date: '22 May',
-        isUnread: false,
+        date: '2 May',
+        isUnread: true,
       ),
       Mail(
         sender: 'Google',
         sub: 'Flutter 1.5',
         msg: 'We have launched Flutter 1.5',
-        date: '20 May',
-        isUnread: true,
+        date: '3 May',
+        isUnread: false,
       ),
       Mail(
         sender: 'Github',
         sub: 'Showcase View',
         msg: 'New star on your showcase view.',
-        date: '21 May ',
-        isUnread: false,
+        date: '4 May ',
+        isUnread: true,
       ),
       Mail(
         sender: 'Simform',
         sub: 'Credit card Plugin',
         msg: 'Check out our credit card plugin',
-        date: '19 May',
-        isUnread: true,
+        date: '5 May',
+        isUnread: false,
       ),
       Mail(
         sender: 'Flutter',
         sub: 'Flutter is Future',
-        msg: 'Flutter laucnhed for Web',
-        date: '18 Jun',
+        msg: 'Flutter launched for Web',
+        date: '6 May',
         isUnread: true,
       ),
       Mail(
         sender: 'Medium',
         sub: 'Showcase View',
         msg: 'Check new showcase View',
-        date: '21 May ',
+        date: '7 May ',
         isUnread: false,
       ),
       Mail(
         sender: 'Simform',
         sub: 'Credit card Plugin',
         msg: 'Check out our credit card plugin',
-        date: '19 May',
+        date: '8 May',
         isUnread: true,
       ),
       Mail(
         sender: 'Flutter',
         sub: 'Flutter is Future',
-        msg: 'Flutter laucnhed for Web',
-        date: '18 Jun',
-        isUnread: true,
+        msg: 'Flutter launched for Web',
+        date: '9 May',
+        isUnread: false,
       ),
     ];
   }
@@ -179,9 +181,16 @@ class _MailPageState extends State<MailPage> {
                                     Showcase(
                                       key: _one,
                                       description: 'Tap to see menu options',
-                                      child: Icon(
-                                        Icons.menu,
-                                        color: Theme.of(context).primaryColor,
+                                      disableDefaultTargetGestures: true,
+                                      onBarrierClick: () =>
+                                          debugPrint('Barrier clicked'),
+                                      child: GestureDetector(
+                                        onTap: () =>
+                                            debugPrint('menu button clicked'),
+                                        child: Icon(
+                                          Icons.menu,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
@@ -209,14 +218,14 @@ class _MailPageState extends State<MailPage> {
                       ),
                     ),
                     Showcase(
-                      overlayPadding: const EdgeInsets.all(5),
+                      targetPadding: const EdgeInsets.all(5),
                       key: _two,
                       title: 'Profile',
                       description:
                           "Tap to see profile which contains user's name, profile picture, mobile number and country",
-                      showcaseBackgroundColor: Theme.of(context).primaryColor,
+                      tooltipBackgroundColor: Theme.of(context).primaryColor,
                       textColor: Colors.white,
-                      shapeBorder: const CircleBorder(),
+                      targetShapeBorder: const CircleBorder(),
                       child: Container(
                         padding: const EdgeInsets.all(5),
                         width: 45,
@@ -256,14 +265,14 @@ class _MailPageState extends State<MailPage> {
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return showcaseMailTile(_three, true, context);
-                  } else if (index == mails.length - 1) {
-                    return showcaseMailTile(_six, false, context);
+                    return showcaseMailTile(_three, true, context, mails.first);
                   }
-                  return MailTile(mails[index % mails.length]);
+                  return MailTile(
+                    mail: mails[index % mails.length],
+                  );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -271,7 +280,7 @@ class _MailPageState extends State<MailPage> {
         key: _five,
         title: 'Compose Mail',
         description: 'Click here to compose mail',
-        shapeBorder: const CircleBorder(),
+        targetShapeBorder: const CircleBorder(),
         child: FloatingActionButton(
           backgroundColor: Theme.of(context).primaryColor,
           onPressed: () {
@@ -280,8 +289,8 @@ class _MailPageState extends State<MailPage> {
                * currently rendered so the showcased keys are available in the
                * render tree. */
               scrollController.jumpTo(0);
-              ShowCaseWidget.of(context)!
-                  .startShowCase([_one, _two, _three, _four, _five, _six]);
+              ShowCaseWidget.of(context)
+                  .startShowCase([_one, _two, _three, _four, _five]);
             });
           },
           child: const Icon(
@@ -293,7 +302,7 @@ class _MailPageState extends State<MailPage> {
   }
 
   GestureDetector showcaseMailTile(GlobalKey<State<StatefulWidget>> key,
-      bool showCaseDetail, BuildContext context) {
+      bool showCaseDetail, BuildContext context, Mail mail) {
     return GestureDetector(
       onTap: () {
         Navigator.push<void>(
@@ -306,133 +315,27 @@ class _MailPageState extends State<MailPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Showcase(
-          key: key,
-          description: 'Tap to check mail',
-          disposeOnTap: true,
-          onTargetClick: () {
-            Navigator.push<void>(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) => const Detail(),
-              ),
-            ).then((_) {
-              setState(() {
-                ShowCaseWidget.of(context)!.startShowCase([_four, _five]);
+            key: key,
+            description: 'Tap to check mail',
+            tooltipPosition: TooltipPosition.top,
+            disposeOnTap: true,
+            onTargetClick: () {
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const Detail(),
+                ),
+              ).then((_) {
+                setState(() {
+                  ShowCaseWidget.of(context).startShowCase([_four, _five]);
+                });
               });
-            });
-          },
-          child: Container(
-            padding:
-                const EdgeInsets.only(left: 6, right: 16, top: 5, bottom: 5),
-            color: const Color(0xffFFF6F7),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      if (showCaseDetail)
-                        Showcase.withWidget(
-                          key: _four,
-                          height: 50,
-                          width: 140,
-                          shapeBorder: const CircleBorder(),
-                          radius: const BorderRadius.all(Radius.circular(150)),
-                          container: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                width: 45,
-                                height: 45,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xffFCD8DC),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'S',
-                                    style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text(
-                                "Your sender's profile ",
-                                style: TextStyle(color: Colors.white),
-                              )
-                            ],
-                          ),
-                          child: const SAvatarExampleChild(),
-                        )
-                      else
-                        const SAvatarExampleChild(),
-                      const Padding(padding: EdgeInsets.only(left: 8)),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          const Text(
-                            'Slack',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
-                            ),
-                          ),
-                          const Text(
-                            'Flutter Notification',
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            'Hi, you have new Notification',
-                            style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 50,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        '1 Jun',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Icon(
-                        Icons.star,
-                        color: Color(0xffFBC800),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+            },
+            child: MailTile(
+              mail: mail,
+              showCaseKey: _four,
+              showCaseDetail: showCaseDetail,
+            )),
       ),
     );
   }
@@ -486,8 +389,14 @@ class Mail {
 }
 
 class MailTile extends StatelessWidget {
-  const MailTile(this.mail, {Key? key}) : super(key: key);
-
+  const MailTile(
+      {required this.mail,
+      this.showCaseDetail = false,
+      this.showCaseKey,
+      Key? key})
+      : super(key: key);
+  final bool showCaseDetail;
+  final GlobalKey<State<StatefulWidget>>? showCaseKey;
   final Mail mail;
 
   @override
@@ -502,25 +411,49 @@ class MailTile extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  width: 45,
-                  height: 45,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xffFCD8DC),
-                  ),
-                  child: Center(
-                    child: Text(
-                      mail.sender[0],
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                if (showCaseDetail)
+                  Showcase.withWidget(
+                    key: showCaseKey!,
+                    height: 50,
+                    width: 140,
+                    targetShapeBorder: const CircleBorder(),
+                    targetBorderRadius: const BorderRadius.all(
+                      Radius.circular(150),
                     ),
-                  ),
-                ),
+                    container: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xffFCD8DC),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'S',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text(
+                          "Your sender's profile ",
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    ),
+                    child: const SAvatarExampleChild(),
+                  )
+                else
+                  const SAvatarExampleChild(),
                 const Padding(padding: EdgeInsets.only(left: 8)),
                 Expanded(
                   child: Column(

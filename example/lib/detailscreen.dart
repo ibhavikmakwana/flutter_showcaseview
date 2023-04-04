@@ -1,3 +1,4 @@
+import 'package:example/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -15,9 +16,11 @@ class _DetailState extends State<Detail> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback(
+    //NOTE: remove ambiguate function if you are using
+    //flutter version greater than 3.x and direct use WidgetsBinding.instance
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback(
       (_) => Future.delayed(const Duration(milliseconds: 200), () {
-        ShowCaseWidget.of(myContext!)!.startShowCase([_one]);
+        ShowCaseWidget.of(myContext!).startShowCase([_one]);
       }),
     );
   }
@@ -65,7 +68,8 @@ class _DetailState extends State<Detail> {
                     height: 16,
                   ),
                   const Text(
-                    'Hi, you have new Notification from flutter group, open slack and check it out',
+                    'Hi, you have new Notification from flutter group, open '
+                    'slack and check it out',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(
@@ -81,7 +85,12 @@ class _DetailState extends State<Detail> {
                         TextSpan(text: 'Hi team,\n\n'),
                         TextSpan(
                           text:
-                              'As some of you know, we’re moving to Slack for our internal team communications. Slack is a messaging app where we can talk, share files, and work together. It also connects with tools we already use, like [add your examples here], plus 900+ other apps.\n\n',
+                              'As some of you know, we’re moving to Slack for '
+                              'our internal team communications. Slack is a '
+                              'messaging app where we can talk, share files, '
+                              'and work together. It also connects with tools '
+                              'we already use, like [add your examples here], '
+                              'plus 900+ other apps.\n\n',
                         ),
                         TextSpan(
                           text: 'Why are we moving to Slack?\n\n',
@@ -92,7 +101,14 @@ class _DetailState extends State<Detail> {
                         ),
                         TextSpan(
                           text:
-                              'We want to use the best communication tools to make our lives easier and be more productive. Having everything in one place will help us work together better and faster, rather than jumping around between emails, IMs, texts and a bunch of other programs. Everything you share in Slack is automatically indexed and archived, creating a searchable archive of all our work.',
+                              'We want to use the best communication tools to '
+                              'make our lives easier and be more productive. '
+                              'Having everything in one place will help us '
+                              'work together better and faster, rather than '
+                              'jumping around between emails, IMs, texts and '
+                              'a bunch of other programs. Everything you share '
+                              'in Slack is automatically indexed and archived, '
+                              'creating a searchable archive of all our work.',
                         ),
                       ],
                     ),

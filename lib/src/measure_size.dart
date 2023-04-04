@@ -23,25 +23,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'extension.dart';
+
 typedef OnWidgetSizeChange = void Function(Size? size);
 
 class MeasureSize extends StatefulWidget {
   final Widget? child;
   final OnWidgetSizeChange onSizeChange;
 
-  MeasureSize({
+  const MeasureSize({
+    Key? key,
     required this.onSizeChange,
     required this.child,
-  });
+  }) : super(key: key);
 
   @override
-  _MeasureSizeState createState() => _MeasureSizeState();
+  State<MeasureSize> createState() => _MeasureSizeState();
 }
 
 class _MeasureSizeState extends State<MeasureSize> {
   @override
   Widget build(BuildContext context) {
-    SchedulerBinding.instance!.addPostFrameCallback(postFrameCallback);
+    ambiguate(SchedulerBinding.instance)
+        ?.addPostFrameCallback(postFrameCallback);
     return Container(
       key: widgetKey,
       child: widget.child,
